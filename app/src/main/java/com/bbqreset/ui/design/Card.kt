@@ -16,25 +16,22 @@ fun BBQCard(
     tonal: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val shape = RoundedCornerShape(20.dp)
+    val shape = RoundedCornerShape(16.dp)
     val background = if (tonal) {
         MaterialTheme.colorScheme.surfaceVariant
     } else {
         MaterialTheme.colorScheme.surface
     }
-    val borderStroke = if (tonal) {
-        null
-    } else {
-        BorderStroke(1.dp, MaterialTheme.extendedColors.border)
-    }
+    // Always use a thin light gray border; no shadows
+    val borderStroke = BorderStroke(1.dp, MaterialTheme.extendedColors.border)
 
     Surface(
         modifier = modifier,
         shape = shape,
         color = background,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        tonalElevation = if (tonal) 2.dp else 0.dp,
-        shadowElevation = if (tonal) 0.dp else 4.dp,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
         border = borderStroke
     ) {
         Column(modifier = Modifier.padding(MaterialTheme.spacing.lg)) {

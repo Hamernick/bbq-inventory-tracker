@@ -46,64 +46,65 @@ object BBQSpacing {
 
 object BBQTokens {
     val colors = BBQColorScheme(
-        primary = Color(0xFF2563EB),
-        primaryForeground = Color.White,
-        secondary = Color(0xFF1E3A8A),
-        secondaryForeground = Color.White,
-        destructive = Color(0xFFDC2626),
-        destructiveForeground = Color.White,
-        background = Color(0xFFF8FAFC),
+        // Grayscale palette
+        primary = Color(0xFF000000),
+        primaryForeground = Color(0xFFFFFFFF),
+        secondary = Color(0xFF333333),
+        secondaryForeground = Color(0xFFFFFFFF),
+        destructive = Color(0xFF333333),
+        destructiveForeground = Color(0xFFFFFFFF),
+        background = Color(0xFFFFFFFF),
         surface = Color(0xFFFFFFFF),
-        surfaceVariant = Color(0xFFF1F5F9),
-        border = Color(0xFFE2E8F0),
-        muted = Color(0xFFE2E8F0),
-        mutedForeground = Color(0xFF475569),
-        success = Color(0xFF16A34A),
-        successForeground = Color.White,
-        warning = Color(0xFFF97316),
-        warningForeground = Color(0xFF1F2937)
+        surfaceVariant = Color(0xFFF2F2F2),
+        border = Color(0xFFE0E0E0),
+        muted = Color(0xFFEAEAEA),
+        mutedForeground = Color(0xFF444444),
+        success = Color(0xFF333333),
+        successForeground = Color(0xFFFFFFFF),
+        warning = Color(0xFF333333),
+        warningForeground = Color(0xFFFFFFFF)
     )
 
     val typography = BBQTypography(
         displayLarge = TextStyle(
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF0F172A)
+            color = Color(0xFF111111)
         ),
         titleLarge = TextStyle(
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF1F2937)
+            color = Color(0xFF1A1A1A)
         ),
         titleMedium = TextStyle(
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF1F2937)
+            color = Color(0xFF1A1A1A)
         ),
         titleSmall = TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF1F2937)
+            color = Color(0xFF1A1A1A)
         ),
         bodyLarge = TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF1F2937)
+            color = Color(0xFF1A1A1A)
         ),
         bodyMedium = TextStyle(
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
-            color = Color(0xFF334155)
+            color = Color(0xFF4D4D4D)
         ),
         labelMedium = TextStyle(
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF475569)
+            color = Color(0xFF666666)
         ),
         labelSmall = TextStyle(
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF64748B)
+            color = Color(0xFF777777)
         )
     )
 }

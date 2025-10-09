@@ -17,12 +17,12 @@ private val LightColors = lightColorScheme(
     onSecondary = BBQTokens.colors.secondaryForeground,
     error = BBQTokens.colors.destructive,
     onError = BBQTokens.colors.destructiveForeground,
-    background = Color(0xFFF8FAFC),
-    onBackground = Color(0xFF0F172A),
-    surface = Color(0xFFFFFFFF),
-    onSurface = Color(0xFF1F2937),
-    surfaceVariant = Color(0xFFE2E8F0),
-    onSurfaceVariant = Color(0xFF334155),
+    background = BBQTokens.colors.background,
+    onBackground = Color(0xFF111111),
+    surface = BBQTokens.colors.surface,
+    onSurface = Color(0xFF1A1A1A),
+    surfaceVariant = BBQTokens.colors.surfaceVariant,
+    onSurfaceVariant = Color(0xFF666666),
     outline = BBQTokens.colors.border
 )
 
@@ -33,13 +33,13 @@ private val DarkColors = darkColorScheme(
     onSecondary = BBQTokens.colors.secondaryForeground,
     error = BBQTokens.colors.destructive,
     onError = BBQTokens.colors.destructiveForeground,
-    background = BBQTokens.colors.background,
-    onBackground = Color(0xFFE2E8F0),
-    surface = BBQTokens.colors.surface,
-    onSurface = Color(0xFFF9FAFB),
-    surfaceVariant = BBQTokens.colors.surfaceVariant,
-    onSurfaceVariant = Color(0xFFC7D2FE),
-    outline = BBQTokens.colors.border
+    background = Color(0xFF0D0D0D),
+    onBackground = Color(0xFFEAEAEA),
+    surface = Color(0xFF121212),
+    onSurface = Color(0xFFEDEDED),
+    surfaceVariant = Color(0xFF1A1A1A),
+    onSurfaceVariant = Color(0xFFB3B3B3),
+    outline = Color(0xFF333333)
 )
 
 private val LocalSpacing = staticCompositionLocalOf { BBQSpacing }

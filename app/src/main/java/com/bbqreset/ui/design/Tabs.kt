@@ -18,6 +18,7 @@ data class BBQTab(
     val badgeCount: Int? = null
 )
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun BBQTabs(
     tabs: List<BBQTab>,
@@ -32,7 +33,7 @@ fun BBQTabs(
             TabRowDefaults.Indicator(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
                 color = MaterialTheme.extendedColors.primary,
-                height = 3.dp
+                height = 2.dp
             )
         }
     ) {

@@ -31,25 +31,13 @@ fun BBQToastHost(
 @Composable
 private fun BBQToast(data: SnackbarData) {
     val visuals = data.visuals
-    val (background, content) = when (visuals.actionLabel) {
-        "success" ->
-            MaterialTheme.extendedColors.success to
-                MaterialTheme.extendedColors.successForeground
-        "warning" ->
-            MaterialTheme.extendedColors.warning to
-                MaterialTheme.extendedColors.warningForeground
-        "destructive" ->
-            MaterialTheme.extendedColors.destructive to
-                MaterialTheme.extendedColors.destructiveForeground
-        else ->
-            MaterialTheme.colorScheme.surfaceVariant to
-                MaterialTheme.colorScheme.onSurface
-    }
+    // Grayscale, no status colors
+    val background = MaterialTheme.colorScheme.surfaceVariant
+    val content = MaterialTheme.colorScheme.onSurface
 
     Snackbar(
         containerColor = background,
         contentColor = content,
-        actionColor = content,
         dismissActionContentColor = content,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {

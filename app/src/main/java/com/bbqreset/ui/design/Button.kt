@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -76,19 +76,15 @@ fun BBQButton(
         ) {
             ButtonContent(text, leadingContent, trailingContent)
         }
-        BBQButtonVariant.GHOST -> ElevatedButton(
+        BBQButtonVariant.GHOST -> TextButton(
             onClick = onClick,
             modifier = modifier,
             enabled = enabled,
             shape = shape,
-            colors = ButtonDefaults.elevatedButtonColors(
-                containerColor = Color.Transparent,
+            colors = ButtonDefaults.textButtonColors(
                 contentColor = MaterialTheme.colorScheme.onSurface
-            ),
-            elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 0.dp)
-        ) {
-            ButtonContent(text, leadingContent, trailingContent)
-        }
+            )
+        ) { ButtonContent(text, leadingContent, trailingContent) }
     }
 }
 
@@ -114,6 +110,13 @@ private fun FilledButton(
             contentColor = contentColor,
             disabledContainerColor = background.copy(alpha = 0.4f),
             disabledContentColor = contentColor.copy(alpha = 0.6f)
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 0.dp,
+            pressedElevation = 0.dp,
+            focusedElevation = 0.dp,
+            hoveredElevation = 0.dp,
+            disabledElevation = 0.dp
         )
     ) {
         ButtonContent(text, leadingContent, trailingContent)

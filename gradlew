@@ -114,28 +114,7 @@ case "$( uname )" in                #(
   NONSTOP* )        nonstop=true ;;
 esac
 
-CLASSPATH="\\\"\\\""
-
-ensure_wrapper_jar() {
-    if [ -f "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" ]; then
-        return
-    fi
-
-    base64_file="$APP_HOME/gradle/wrapper/gradle-wrapper.jar.base64"
-    if [ ! -f "$base64_file" ]; then
-        die "Gradle wrapper JAR is missing and no base64 payload was found at $base64_file"
-    fi
-
-    if ! command -v base64 >/dev/null 2>&1; then
-        die "base64 utility is required to materialize the Gradle wrapper JAR"
-    fi
-
-    if ! base64 --decode "$base64_file" > "$APP_HOME/gradle/wrapper/gradle-wrapper.jar"; then
-        die "Failed to decode Gradle wrapper JAR from $base64_file"
-    fi
-}
-
-ensure_wrapper_jar
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
 
 # Determine the Java command to use to start the JVM.
@@ -234,7 +213,7 @@ DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 set -- \
         "-Dorg.gradle.appname=$APP_BASE_NAME" \
         -classpath "$CLASSPATH" \
-        -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
+        org.gradle.wrapper.GradleWrapperMain \
         "$@"
 
 # Stop when "xargs" is not available.
