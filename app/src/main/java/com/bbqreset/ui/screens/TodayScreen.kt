@@ -1,42 +1,45 @@
 package com.bbqreset.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bbqreset.ui.design.BBQBadge
 import com.bbqreset.ui.design.BBQButton
 import com.bbqreset.ui.design.BBQButtonVariant
 import com.bbqreset.ui.design.BBQCard
-import com.bbqreset.ui.design.BBQTab
-import com.bbqreset.ui.design.BBQTabs
 import com.bbqreset.ui.design.BBQTheme
 import com.bbqreset.ui.design.BBQToastHost
 import com.bbqreset.ui.design.extendedColors
@@ -45,259 +48,392 @@ import com.bbqreset.ui.design.rememberBBQToastHostState
 import com.bbqreset.ui.design.spacing
 import kotlinx.coroutines.launch
 
-data class TodayMenuItem(
+data class InventoryDay(
     val id: Int,
-    val name: String,
-    val startQty: Int,
-    val soldQty: Int,
-    val alerts: List<String> = emptyList()
+    val dayOfWeek: String,
+    val dateNumber: String
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
+data class InventoryEntry(
+    val id: Int,
+    val name: String,
+    val sku: String,
+    val unit: String,
+    val start: Int,
+    val sold: Int,
+    val onHand: Int
+)
+
+data class TodayUiState(
+    val headerTitle: String,
+    val headerSubtitle: String,
+    val days: List<InventoryDay>,
+    val selectedDayIndex: Int,
+    val entries: List<InventoryEntry>
+)
+
 @Composable
 fun TodayScreen(
-    items: List<TodayMenuItem> = sampleMenuItems
+    state: TodayUiState = sampleTodayUiState
 ) {
-    val tabIndex = rememberSaveable { mutableIntStateOf(0) }
     val toastHostState = rememberBBQToastHostState()
     val coroutineScope = rememberCoroutineScope()
-    val tabs = remember {
-        listOf(
-            BBQTab("Today"),
-            BBQTab("Templates"),
-            BBQTab("Logs", badgeCount = 3)
-        )
+    val safeIndex = remember(state.days, state.selectedDayIndex) {
+        if (state.days.isEmpty()) {
+            0
+        } else {
+            state.selectedDayIndex.coerceIn(state.days.indices)
+        }
+    }
+    var selectedIndex by rememberSaveable(state.days.size, safeIndex) {
+        mutableIntStateOf(safeIndex)
     }
 
-    val showToast: (String, String) -> Unit = { message, label ->
-        coroutineScope.launch {
-            toastHostState.showSnackbar(message, actionLabel = label)
+    val showToast: (String, String) -> Unit = remember {
+        { message, label ->
+            coroutineScope.launch {
+                toastHostState.showSnackbar(message, actionLabel = label)
+            }
         }
     }
 
     Scaffold(
-        topBar = {
-            TodayTopBar(
-                onSyncClick = {
-                    showToast("Syncing inventory…", "warning")
-                }
-            )
-        },
-        snackbarHost = { BBQToastHost(hostState = toastHostState) }
+        snackbarHost = { BBQToastHost(hostState = toastHostState) },
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = MaterialTheme.spacing.lg)
-                .padding(vertical = MaterialTheme.spacing.lg),
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.lg)
-        ) {
-            BBQTabs(
-                tabs = tabs,
-                selectedIndex = tabIndex.intValue,
-                onSelectedChange = { tabIndex.intValue = it }
-            )
-
-            TodaySummaryCard(
-                onAdjust = { showToast("Adjustment queued", "success") },
-                onSoldOut = { showToast("Marked sold out", "destructive") }
-            )
-
-            Text(
-                text = "Line items",
-                style = MaterialTheme.extendedTypography.titleMedium
-            )
-
-            MenuItemList(
-                items = items,
-                onAdjust = { item ->
-                    showToast("Adjusted ${item.name}", "success")
-                }
-            )
-
-            BBQButton(
-                text = "Add manual item",
-                variant = BBQButtonVariant.OUTLINE,
-                onClick = { showToast("Manual add coming soon", "warning") },
-                leadingContent = {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TodayTopBar(onSyncClick: () -> Unit) {
-    TopAppBar(
-        title = {
-            Text(
-                text = "Today",
-                style = MaterialTheme.extendedTypography.titleLarge
-            )
-        },
-        actions = {
-            IconButton(onClick = onSyncClick) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Sync"
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    )
-}
-
-@Composable
-private fun TodaySummaryCard(
-    onAdjust: () -> Unit,
-    onSoldOut: () -> Unit
-) {
-    BBQCard(
-        modifier = Modifier.fillMaxWidth(),
-        tonal = true
-    ) {
-        Text(
-            text = "Remaining brisket",
-            style = MaterialTheme.extendedTypography.titleMedium
-        )
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.sm))
-        Row(
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)
+                .padding(horizontal = MaterialTheme.spacing.xl)
+                .padding(vertical = MaterialTheme.spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xl)
         ) {
             Text(
-                text = "42",
+                text = "BBQ Inventory",
                 style = MaterialTheme.extendedTypography.displayLarge
             )
-            BBQBadge(
-                text = "-6 vs start",
-                background = MaterialTheme.extendedColors.warning,
-                contentColor = MaterialTheme.extendedColors.warningForeground
-            )
-        }
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.md))
-        Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)) {
-            BBQButton(
-                text = "Adjust",
-                variant = BBQButtonVariant.SECONDARY,
-                onClick = onAdjust
-            )
-            BBQButton(
-                text = "Sold out",
-                variant = BBQButtonVariant.DESTRUCTIVE,
-                onClick = onSoldOut
-            )
-        }
-    }
-}
 
-@Composable
-private fun MenuItemList(
-    items: List<TodayMenuItem>,
-    onAdjust: (TodayMenuItem) -> Unit
-) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md),
-        modifier = Modifier.weight(1f, fill = false)
-    ) {
-        items(items, key = TodayMenuItem::id) { item ->
-            MenuItemRow(
-                item = item,
-                onAdjust = { onAdjust(item) }
+            WeekStrip(
+                days = state.days,
+                selectedIndex = selectedIndex,
+                onSelect = { index ->
+                    selectedIndex = index
+                    showToast("Switched to ${state.days[index].dayOfWeek}", "success")
+                },
+                onNavigatePrevious = {
+                    showToast("Loading previous week", "warning")
+                },
+                onNavigateNext = {
+                    showToast("Loading next week", "warning")
+                }
             )
-        }
-    }
-}
 
-@Composable
-private fun MenuItemRow(
-    item: TodayMenuItem,
-    onAdjust: () -> Unit
-) {
-    BBQCard(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
+            InventoryCard(
+                title = state.headerTitle,
+                subtitle = state.headerSubtitle,
+                entries = state.entries,
+                onAddItem = { showToast("Add inventory item", "warning") },
+                onMoreActions = { showToast("More actions coming soon", "warning") }
+            )
+
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                BBQButton(
+                    text = "Download report (CSV)",
+                    variant = BBQButtonVariant.OUTLINE,
+                    onClick = { showToast("Export scheduled", "success") },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.FileDownload,
+                            contentDescription = null
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeekStrip(
+    days: List<InventoryDay>,
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit,
+    onNavigatePrevious: () -> Unit,
+    onNavigateNext: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)
+    ) {
+        IconButton(onClick = onNavigatePrevious, enabled = days.isNotEmpty()) {
+            Icon(
+                imageVector = Icons.Default.ChevronLeft,
+                contentDescription = "Previous week"
+            )
+        }
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md),
+            modifier = Modifier.weight(1f)
+        ) {
+            itemsIndexed(days, key = { _, day -> day.id }) { index, day ->
+                DayChip(
+                    day = day,
+                    selected = index == selectedIndex,
+                    onClick = { onSelect(index) }
+                )
+            }
+        }
+
+        IconButton(onClick = onNavigateNext, enabled = days.isNotEmpty()) {
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = "Next week"
+            )
+        }
+    }
+}
+
+@Composable
+private fun DayChip(
+    day: InventoryDay,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val containerColor = if (selected) {
+        MaterialTheme.extendedColors.primary
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+    val contentColor = if (selected) {
+        MaterialTheme.extendedColors.primaryForeground
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+    val borderColor = if (selected) {
+        Color.Transparent
+    } else {
+        MaterialTheme.extendedColors.border
+    }
+
+    Surface(
+        onClick = onClick,
+        enabled = true,
+        shape = RoundedCornerShape(14.dp),
+        color = containerColor,
+        contentColor = contentColor,
+        tonalElevation = if (selected) 4.dp else 0.dp,
+        shadowElevation = if (selected) 2.dp else 0.dp,
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = MaterialTheme.spacing.lg, vertical = MaterialTheme.spacing.sm),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)
+        ) {
+            Text(
+                text = day.dayOfWeek.uppercase(),
+                style = MaterialTheme.extendedTypography.labelMedium.copy(
+                    color = contentColor,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = day.dateNumber,
+                style = MaterialTheme.extendedTypography.titleSmall.copy(
+                    color = contentColor,
+                    fontWeight = FontWeight.Bold
+                ),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun InventoryCard(
+    title: String,
+    subtitle: String,
+    entries: List<InventoryEntry>,
+    onAddItem: () -> Unit,
+    onMoreActions: () -> Unit
+) {
+    BBQCard(modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.lg)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)) {
                     Text(
-                        text = item.name,
-                        style = MaterialTheme.extendedTypography.bodyLarge
+                        text = title,
+                        style = MaterialTheme.extendedTypography.titleLarge
                     )
                     Text(
-                        text = "Start ${item.startQty} • Sold ${item.soldQty}",
-                        style = MaterialTheme.extendedTypography.labelMedium
+                        text = subtitle,
+                        style = MaterialTheme.extendedTypography.bodyMedium
                     )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)) {
-                    item.alerts.forEach { alert ->
-                        BBQBadge(text = alert)
+                Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
+                    IconButton(onClick = onAddItem) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add inventory item"
+                        )
+                    }
+                    IconButton(onClick = onMoreActions) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More actions"
+                        )
                     }
                 }
             }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
-            ) {
-                BBQButton(
-                    text = "Adjust",
-                    variant = BBQButtonVariant.SECONDARY,
-                    onClick = onAdjust,
-                    modifier = Modifier.weight(1f)
-                )
-                BBQButton(
-                    text = "Count",
-                    variant = BBQButtonVariant.GHOST,
-                    onClick = onAdjust,
-                    modifier = Modifier.weight(1f)
-                )
+
+            InventoryTableHeader()
+
+            entries.forEachIndexed { index, entry ->
+                InventoryTableRow(entry)
+                if (index < entries.lastIndex) {
+                    HorizontalDivider(color = MaterialTheme.extendedColors.border.copy(alpha = 0.5f))
+                }
             }
         }
     }
 }
 
-private val sampleMenuItems = listOf(
-    TodayMenuItem(
-        id = 1,
-        name = "Brisket Plate",
-        startQty = 48,
-        soldQty = 19,
-        alerts = listOf("low")
+@Composable
+private fun InventoryTableHeader() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MaterialTheme.spacing.sm),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        HeaderCell(text = "Item", weight = 0.4f)
+        HeaderCell(text = "Unit", weight = 0.16f, textAlign = TextAlign.Center)
+        HeaderCell(text = "Start", weight = 0.15f, textAlign = TextAlign.Center)
+        HeaderCell(text = "Sold", weight = 0.15f, textAlign = TextAlign.Center)
+        HeaderCell(text = "On Hand", weight = 0.14f, textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
+private fun HeaderCell(
+    text: String,
+    weight: Float,
+    textAlign: TextAlign = TextAlign.Start
+) {
+    Text(
+        text = text.uppercase(),
+        modifier = Modifier
+            .weight(weight)
+            .padding(vertical = MaterialTheme.spacing.xs),
+        style = MaterialTheme.extendedTypography.labelMedium.copy(fontWeight = FontWeight.Bold),
+        textAlign = textAlign
+    )
+}
+
+@Composable
+private fun InventoryTableRow(entry: InventoryEntry) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = MaterialTheme.spacing.md),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ItemCell(entry, modifier = Modifier.weight(0.4f))
+        ValueCell(entry.unit, modifier = Modifier.weight(0.16f))
+        ValueCell(entry.start.toString(), modifier = Modifier.weight(0.15f))
+        ValueCell(entry.sold.toString(), modifier = Modifier.weight(0.15f))
+        ValueCell(entry.onHand.toString(), modifier = Modifier.weight(0.14f))
+    }
+}
+
+@Composable
+private fun ItemCell(entry: InventoryEntry, modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)) {
+        Text(
+            text = entry.name,
+            style = MaterialTheme.extendedTypography.bodyLarge
+        )
+        Text(
+            text = entry.sku,
+            style = MaterialTheme.extendedTypography.labelSmall
+        )
+    }
+}
+
+@Composable
+private fun ValueCell(value: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.extendedTypography.bodyMedium,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+private val sampleTodayUiState = TodayUiState(
+    headerTitle = "Inventory — 10-08-2025",
+    headerSubtitle = "Set your daily counts and watch sales update in real time.",
+    days = listOf(
+        InventoryDay(id = 1, dayOfWeek = "Wed", dateNumber = "8"),
+        InventoryDay(id = 2, dayOfWeek = "Thu", dateNumber = "9"),
+        InventoryDay(id = 3, dayOfWeek = "Fri", dateNumber = "10"),
+        InventoryDay(id = 4, dayOfWeek = "Sat", dateNumber = "11"),
+        InventoryDay(id = 5, dayOfWeek = "Sun", dateNumber = "12"),
+        InventoryDay(id = 6, dayOfWeek = "Mon", dateNumber = "13"),
+        InventoryDay(id = 7, dayOfWeek = "Tue", dateNumber = "14")
     ),
-    TodayMenuItem(
-        id = 2,
-        name = "Pulled Pork Sandwich",
-        startQty = 64,
-        soldQty = 32
-    ),
-    TodayMenuItem(
-        id = 3,
-        name = "Burnt Ends",
-        startQty = 30,
-        soldQty = 21,
-        alerts = listOf("warn")
+    selectedDayIndex = 0,
+    entries = listOf(
+        InventoryEntry(
+            id = 1,
+            name = "Brisket",
+            sku = "SKU: BBQ-001",
+            unit = "LBS",
+            start = 50,
+            sold = 0,
+            onHand = 50
+        ),
+        InventoryEntry(
+            id = 2,
+            name = "Ribs Half Rack",
+            sku = "SKU: BBQ-004",
+            unit = "LBS",
+            start = 42,
+            sold = 0,
+            onHand = 42
+        ),
+        InventoryEntry(
+            id = 3,
+            name = "Cornbread Loaf",
+            sku = "SKU: BAK-102",
+            unit = "ITEMS",
+            start = 24,
+            sold = 0,
+            onHand = 24
+        )
     )
 )
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFFF8FAFC)
 @Composable
 fun TodayScreenPreview() {
-    BBQTheme {
+    BBQTheme(darkTheme = false) {
         TodayScreen()
     }
 }
