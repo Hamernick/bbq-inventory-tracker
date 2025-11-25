@@ -1,5 +1,6 @@
 package com.bbqreset.data.db
 
+import androidx.room.withTransaction
 import com.bbqreset.data.db.entity.CounterEntity
 import com.bbqreset.data.db.entity.ItemEntity
 import com.bbqreset.data.db.entity.JobEntity
@@ -11,10 +12,9 @@ import com.bbqreset.data.db.entity.TemplateItemEntity
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import androidx.room.withTransaction
+import kotlinx.coroutines.withContext
 
 class DebugDatabaseSeeder(
     private val clock: Clock
@@ -35,21 +35,24 @@ class DebugDatabaseSeeder(
                 cloverItemId = "clover-smoked-brisket",
                 name = "Smoked Brisket",
                 sku = "BBQ-001",
-                locationId = location.id
+                locationId = location.id,
+                unitType = "lbs"
             ),
             ItemEntity(
                 id = 2L,
                 cloverItemId = "clover-ribs-half",
                 name = "Spare Ribs Half Rack",
                 sku = "BBQ-004",
-                locationId = location.id
+                locationId = location.id,
+                unitType = "count"
             ),
             ItemEntity(
                 id = 3L,
                 cloverItemId = "clover-cornbread",
                 name = "Cornbread Loaf",
                 sku = "BAK-102",
-                locationId = location.id
+                locationId = location.id,
+                unitType = "each"
             )
         )
 
@@ -148,6 +151,28 @@ class DebugDatabaseSeeder(
             database.counterDao().upsertAll(counters)
             database.logDao().insertAll(logs)
             database.jobDao().upsertAll(jobs)
+            // Seed a week plan for current week (Monday start) with template quantities
+            val weekStart = java.time.LocalDate.now(clock)
+                .with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+                .toString()
+            val planDao = database.weekPlanDao()
+            templateItems.forEach { ti ->
+                planDao.upsert(
+                    com.bbqreset.data.db.entity.WeekPlanEntity(
+                        weekStart = weekStart,
+                        itemId = ti.itemId,
+                        locationId = location.id,
+                        quantityDefault = ti.startQuantity,
+                        quantityMon = ti.startQuantity,
+                        quantityTue = ti.startQuantity,
+                        quantityWed = ti.startQuantity,
+                        quantityThu = ti.startQuantity,
+                        quantityFri = ti.startQuantity,
+                        quantitySat = ti.startQuantity,
+                        quantitySun = ti.startQuantity
+                    )
+                )
+            }
         }
     }
 }

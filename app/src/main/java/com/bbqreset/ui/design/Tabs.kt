@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bbqreset.ui.design.system.LocalDSColors
 
 data class BBQTab(
     val label: String,
@@ -25,14 +26,15 @@ fun BBQTabs(
     selectedIndex: Int,
     onSelectedChange: (Int) -> Unit
 ) {
+    val ds = LocalDSColors.current
     TabRow(
         selectedTabIndex = selectedIndex,
         containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.extendedColors.primary,
+        contentColor = ds.primary,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
-                color = MaterialTheme.extendedColors.primary,
+                color = ds.primary,
                 height = 2.dp
             )
         }
@@ -41,8 +43,8 @@ fun BBQTabs(
             Tab(
                 selected = selectedIndex == index,
                 onClick = { onSelectedChange(index) },
-                selectedContentColor = MaterialTheme.extendedColors.primary,
-                unselectedContentColor = MaterialTheme.extendedColors.mutedForeground,
+                selectedContentColor = ds.primary,
+                unselectedContentColor = ds.mutedForeground,
                 text = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

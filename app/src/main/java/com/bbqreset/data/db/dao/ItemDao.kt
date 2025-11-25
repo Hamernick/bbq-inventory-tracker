@@ -29,4 +29,10 @@ interface ItemDao {
 
     @Query("DELETE FROM items WHERE location_id = :locationId")
     suspend fun deleteForLocation(locationId: Long)
+
+    @Query("SELECT MAX(id) FROM items")
+    suspend fun maxId(): Long?
+
+    @Query("DELETE FROM items WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<Long>)
 }

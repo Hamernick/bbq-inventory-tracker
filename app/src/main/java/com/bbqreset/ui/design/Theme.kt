@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import com.bbqreset.ui.design.system.*
 
 private val LightColors = lightColorScheme(
     primary = BBQTokens.colors.primary,
@@ -71,10 +72,21 @@ fun BBQTheme(
         LocalExtendedColors provides BBQTokens.colors,
         LocalTypography provides BBQTokens.typography
     ) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = MaterialTheme.typography.copy(),
-            content = content
-        )
+        DSTheme(
+            colors = LocalDSColors.current.copy(
+                surface = colorScheme.surface,
+                onSurface = colorScheme.onSurface,
+                surfaceVariant = colorScheme.surfaceVariant,
+                onSurfaceVariant = colorScheme.onSurfaceVariant,
+                primary = colorScheme.primary,
+                onPrimary = colorScheme.onPrimary
+            )
+        ) {
+            MaterialTheme(
+                colorScheme = colorScheme,
+                typography = MaterialTheme.typography.copy(),
+                content = content
+            )
+        }
     }
 }

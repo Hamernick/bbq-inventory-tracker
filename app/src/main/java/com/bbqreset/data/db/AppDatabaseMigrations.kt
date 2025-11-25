@@ -172,6 +172,63 @@ val MIGRATION_0_1 = object : Migration(0, 1) {
     }
 }
 
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `week_plans` (
+                `week_start` TEXT NOT NULL,
+                `item_id` INTEGER NOT NULL,
+                `location_id` INTEGER NOT NULL,
+                `quantity` INTEGER NOT NULL,
+                PRIMARY KEY(`week_start`, `item_id`, `location_id`)
+            )
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS `index_week_plans_week_start_location_id`
+            ON `week_plans`(`week_start`, `location_id`)
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS `index_week_plans_item_id`
+            ON `week_plans`(`item_id`)
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS `index_week_plans_location_id`
+            ON `week_plans`(`location_id`)
+            """.trimIndent()
+        )
+    }
+}
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE week_plans ADD COLUMN quantity_default INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE week_plans ADD COLUMN quantity_mon INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE week_plans ADD COLUMN quantity_tue INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE week_plans ADD COLUMN quantity_wed INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE week_plans ADD COLUMN quantity_thu INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE week_plans ADD COLUMN quantity_fri INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE week_plans ADD COLUMN quantity_sat INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE week_plans ADD COLUMN quantity_sun INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("UPDATE week_plans SET quantity_default = quantity")
+    }
+}
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE items ADD COLUMN unit_type TEXT NOT NULL DEFAULT 'count'")
+    }
+}
+
 val AppDatabaseMigrations: Array<Migration> = arrayOf(
-    MIGRATION_0_1
+    MIGRATION_0_1,
+    MIGRATION_1_2,
+    MIGRATION_2_3,
+    MIGRATION_3_4
 )

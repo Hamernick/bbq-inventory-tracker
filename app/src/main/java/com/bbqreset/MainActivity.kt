@@ -1,142 +1,132 @@
+@file:Suppress("FunctionNaming")
+
 package com.bbqreset
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import com.bbqreset.core.di.DatabaseModule
-import com.bbqreset.data.repo.CounterRepository
-import com.bbqreset.data.repo.JobRepository
-import com.bbqreset.data.repo.LogRepository
-import com.bbqreset.domain.ResetPlanner
-import com.bbqreset.ui.design.BBQTab
-import com.bbqreset.ui.design.BBQTabs
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.bbqreset.ui.design.BBQTheme
-import com.bbqreset.ui.screens.DashboardScreen
-import com.bbqreset.ui.screens.TodayScreen
-import com.bbqreset.ui.screens.loadTodayUiState
-import com.bbqreset.ui.screens.sampleTodayUiState
-import java.time.Clock
-import java.time.ZoneId
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import com.bbqreset.work.DailyResetScheduler
+import com.bbqreset.ui.screens.SettingsScreen
+import com.bbqreset.ui.screens.WeekGridScreen
+import com.bbqreset.ui.vm.WeekGridViewModel
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            BBQApp()
+        setContent { BBQApp() }
+    }
+}
+
+private const val ROUTE_SPLASH = "splash"
+private const val ROUTE_WEEK = "week"
+private const val ROUTE_SETTINGS = "settings"
+
+@Composable
+fun BBQApp() {
+    BBQTheme {
+        val nav = rememberNavController()
+        val view = LocalView.current
+        val surfaceColor = MaterialTheme.colorScheme.surfaceVariant.toArgb()
+        SideEffect {
+            val window = (view.context as? ComponentActivity)?.window
+            if (window != null) {
+                WindowCompat.setDecorFitsSystemWindows(window, false)
+                val controller = WindowCompat.getInsetsController(window, window.decorView)
+                controller.isAppearanceLightStatusBars = true
+                controller.isAppearanceLightNavigationBars = true
+                controller.hide(
+                    android.view.WindowInsets.Type.statusBars() or
+                        android.view.WindowInsets.Type.navigationBars()
+                )
+                controller.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                window.statusBarColor = surfaceColor
+                window.navigationBarColor = surfaceColor
+            }
+        }
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            AppNavHost(nav = nav)
         }
     }
 }
 
 @Composable
-fun BBQApp() {
-    val context = LocalContext.current.applicationContext
-    val clock = remember { Clock.systemUTC() }
-    val database = remember {
-        DatabaseModule.provideAppDatabase(context = context, clock = clock)
-    }
-    val counterRepository = remember { CounterRepository.fromDatabase(database) }
-    val logRepository = remember { LogRepository(database.logDao(), clock) }
-    val jobRepository = remember { JobRepository(database.jobDao(), clock) }
-    val resetPlanner = remember { ResetPlanner(clock) }
-    val scheduler = remember { DailyResetScheduler.create(context, jobRepository, resetPlanner) }
-    val appScope = rememberCoroutineScope()
-    var refreshKey by rememberSaveable { mutableIntStateOf(0) }
-    var selectedSection by rememberSaveable { mutableStateOf(AppSection.DASHBOARD) }
-    val todayState by produceState(
-        initialValue = sampleTodayUiState,
-        database,
-        refreshKey
+private fun AppNavHost(
+    nav: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    NavHost(
+        navController = nav,
+        startDestination = ROUTE_SPLASH,
+        modifier = modifier
     ) {
-        value = withContext(Dispatchers.IO) {
-            loadTodayUiState(database)
-        }
-    }
-    val locationName = todayState.locationName
-
-    BBQTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Column {
-                val tabs = listOf(BBQTab("Dashboard"), BBQTab("Inventory"))
-                BBQTabs(
-                    tabs = tabs,
-                    selectedIndex = selectedSection.ordinal,
-                    onSelectedChange = { index -> selectedSection = AppSection.values()[index] }
-                )
-
-                when (selectedSection) {
-                    AppSection.DASHBOARD -> {
-                        val dailyReports = todayState.days.mapIndexed { idx, d ->
-                            val base = todayState.summary.soldTotal
-                            val value = (base / 7) + (idx * 3 % 9) // simple placeholder trend
-                            com.bbqreset.ui.screens.DayReport(d.dayOfWeek, value)
-                        }
-                        DashboardScreen(
-                            locationName = locationName,
-                            overview = todayState.summary,
-                            dailyReports = dailyReports,
-                            momDeltaPercent = 12,
-                            onGoToInventory = { selectedSection = AppSection.INVENTORY },
-                            onScheduleReset = {
-                                val zoneId = runCatching { ZoneId.of(todayState.locationTimeZoneId) }
-                                    .getOrElse { ZoneId.of("UTC") }
-                                appScope.launch {
-                                    scheduler.schedule(
-                                        locationId = todayState.locationId,
-                                        openHour = DEFAULT_OPEN_HOUR,
-                                        openMinute = DEFAULT_OPEN_MINUTE,
-                                        zoneId = zoneId
-                                    )
-                                }
-                            },
-                            onExportCsv = {}
-                        )
-                    }
-                    AppSection.INVENTORY -> {
-                        TodayScreen(
-                            state = todayState,
-                            onScheduleReset = {
-                                val zoneId = runCatching { ZoneId.of(todayState.locationTimeZoneId) }
-                                    .getOrElse { ZoneId.of("UTC") }
-                                appScope.launch {
-                                    scheduler.schedule(
-                                        locationId = todayState.locationId,
-                                        openHour = DEFAULT_OPEN_HOUR,
-                                        openMinute = DEFAULT_OPEN_MINUTE,
-                                        zoneId = zoneId
-                                    )
-                                }
-                            },
-                            onExportCsv = {},
-                            onAdjustItem = {}
-                        )
-                    }
+        composable(ROUTE_SPLASH) {
+            SplashRoute(onReady = {
+                nav.navigate(ROUTE_WEEK) {
+                    popUpTo(ROUTE_SPLASH) { inclusive = true }
                 }
-            }
+            })
+        }
+        composable(ROUTE_WEEK) {
+            val vm: WeekGridViewModel = viewModel()
+            val uiState by vm.ui.collectAsState()
+            WeekGridScreen(
+                state = uiState,
+                onConnect = { vm.connect() },
+                onOpenSettings = { nav.navigate(ROUTE_SETTINGS) },
+                onCreateItem = vm::createItem,
+                onReseedSample = vm::reseedSample,
+                onSelectLocation = vm::selectLocation,
+                onWeekPicked = vm::setWeekFromDate,
+                onToggleSelect = vm::toggleSelection,
+                onAddItems = vm::addItems,
+                onDeleteSelected = vm::deleteSelected,
+                onUpdateQuantity = vm::updateQuantity,
+                onApply = { vm.applyNow() }
+            )
+        }
+        composable(ROUTE_SETTINGS) {
+            SettingsScreen()
         }
     }
 }
-private enum class AppSection { DASHBOARD, INVENTORY }
-private const val DEFAULT_OPEN_HOUR = 4
-private const val DEFAULT_OPEN_MINUTE = 30
+
+@Composable
+private fun SplashRoute(onReady: () -> Unit) {
+    LaunchedEffect(Unit) {
+        // Boot gate: token/DB checks would go here
+        delay(300)
+        onReady()
+    }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Loading...",
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+}

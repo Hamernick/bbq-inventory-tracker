@@ -1,0 +1,128 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:TodayScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TodayScreen( state: TodayUiState = sampleTodayUiState, onScheduleReset: () -&gt; Unit = {}, onExportCsv: () -&gt; Unit = {}, onAdjustItem: (InventoryEntry) -&gt; Unit = {}, onSelectDate: (String) -&gt; Unit = {} )</ID>
+    <ID>ForbiddenComment:MainActivity.kt$/* TODO: enqueue apply */</ID>
+    <ID>FunctionNaming:Badge.kt$@Composable fun BBQBadge( text: String, modifier: Modifier = Modifier, background: Color = LocalDSColors.current.muted, contentColor: Color = LocalDSColors.current.mutedForeground )</ID>
+    <ID>FunctionNaming:Button.kt$@Composable fun BBQButton( text: String, modifier: Modifier = Modifier, variant: BBQButtonVariant = BBQButtonVariant.PRIMARY, enabled: Boolean = true, shape: Shape = LocalDSShapes.current.chip, leadingContent: (@Composable (() -&gt; Unit))? = null, trailingContent: (@Composable (() -&gt; Unit))? = null, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:Button.kt$@Composable private fun ButtonContent( text: String, leadingContent: (@Composable (() -&gt; Unit))?, trailingContent: (@Composable (() -&gt; Unit))? )</ID>
+    <ID>FunctionNaming:Button.kt$@Composable private fun FilledButton( text: String, modifier: Modifier, enabled: Boolean, shape: Shape, background: Color, contentColor: Color, leadingContent: (@Composable (() -&gt; Unit))?, trailingContent: (@Composable (() -&gt; Unit))?, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:Card.kt$@Composable fun BBQCard( modifier: Modifier = Modifier, tonal: Boolean = false, content: @Composable () -&gt; Unit )</ID>
+    <ID>FunctionNaming:DashboardScreen.kt$@Composable fun DashboardScreen( locationName: String, overview: InventorySummary, onGoToInventory: () -&gt; Unit, onScheduleReset: () -&gt; Unit, onExportCsv: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:DashboardScreen.kt$@Composable private fun OverviewCard(overview: InventorySummary)</ID>
+    <ID>FunctionNaming:DashboardScreen.kt$@Composable private fun QuickActionCard( label: String, modifier: Modifier = Modifier, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:DashboardScreen.kt$@Composable private fun QuickActionsCards( onGoToInventory: () -&gt; Unit, onScheduleReset: () -&gt; Unit, onExportCsv: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:DashboardScreen.kt$@Composable private fun Stat(label: String, value: Int)</ID>
+    <ID>FunctionNaming:DashboardScreen.kt$@Preview(showBackground = true) @Composable private fun DashboardPreview()</ID>
+    <ID>FunctionNaming:DesignSystem.kt$@Composable fun DSTheme( colors: DSColors = LocalDSColors.current, typography: DSTypography = LocalDSTypography.current, spacing: DSSpacing = LocalDSSpacing.current, radius: DSRadius = LocalDSRadius.current, elevation: DSElevation = LocalDSElevation.current, motion: DSMotion = LocalDSMotion.current, shapes: DSShapes = LocalDSShapes.current, content: @Composable () -&gt; Unit )</ID>
+    <ID>FunctionNaming:Input.kt$@Composable fun BBQInputField( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, label: String? = null, helperText: String? = null, enabled: Boolean = true, singleLine: Boolean = true, leadingIcon: (@Composable (() -&gt; Unit))? = null, trailingIcon: (@Composable (() -&gt; Unit))? = null, placeholder: String? = null, visualTransformation: VisualTransformation = VisualTransformation.None, textStyle: TextStyle = MaterialTheme.extendedTypography.bodyLarge, shape: Shape = LocalDSShapes.current.chip )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable fun SettingsScreen()</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Preview(showBackground = true) @Composable private fun SettingsPreview()</ID>
+    <ID>FunctionNaming:Sheet.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun BBQSheet( onDismiss: () -&gt; Unit, sheetState: SheetState, dragHandle: (@Composable (() -&gt; Unit))? = null, content: @Composable () -&gt; Unit )</ID>
+    <ID>FunctionNaming:Tabs.kt$@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class) @Composable fun BBQTabs( tabs: List&lt;BBQTab&gt;, selectedIndex: Int, onSelectedChange: (Int) -&gt; Unit )</ID>
+    <ID>FunctionNaming:Theme.kt$@Composable fun BBQTheme( darkTheme: Boolean = isSystemInDarkTheme(), colorScheme: ColorScheme = if (darkTheme) DarkColors else LightColors, content: @Composable () -&gt; Unit )</ID>
+    <ID>FunctionNaming:Toast.kt$@Composable fun BBQToastHost( hostState: SnackbarHostState, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:Toast.kt$@Composable private fun BBQToast(data: SnackbarData)</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun ActionCard( onScheduleReset: () -&gt; Unit, onApplyTemplate: () -&gt; Unit, onExportCsv: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun AddItemSheetContent( onAddNew: () -&gt; Unit, onReuse: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun DateNavButton( icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: String, enabled: Boolean, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun DateStrip( days: List&lt;InventoryDay&gt;, selectedIndex: Int, onSelect: (Int) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun DateStripContainer( days: List&lt;InventoryDay&gt;, selectedIndex: Int, onSelect: (Int) -&gt; Unit, onNavigatePrevious: () -&gt; Unit, onNavigateNext: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun EmptyInventoryState( dateLabel: String, modifier: Modifier = Modifier, onAdd: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun HeaderSection( title: String, subtitle: String, locationName: String, openStatusLabel: String, nextResetLabel: String, showTodayButton: Boolean, onJumpToToday: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun InventoryEntryCard( entry: InventoryEntry, onAdjust: () -&gt; Unit, onQuickSoldOut: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun InventoryStat( label: String, value: Int, unit: String )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun InventoryStatusBadge(status: InventoryStatus)</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Composable private fun ReuseItemPickerDialog( items: List&lt;InventoryEntry&gt;, onDismiss: () -&gt; Unit, onPicked: (InventoryEntry) -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TodayScreen( state: TodayUiState = sampleTodayUiState, onScheduleReset: () -&gt; Unit = {}, onExportCsv: () -&gt; Unit = {}, onAdjustItem: (InventoryEntry) -&gt; Unit = {}, onSelectDate: (String) -&gt; Unit = {} )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun AddNewItemDialog( onDismiss: () -&gt; Unit, onConfirm: (name: String, sku: String, unit: String, qty: Int) -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun ConfirmReuseDialog( item: InventoryEntry, onDismiss: () -&gt; Unit, onConfirm: (qty: Int) -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun DateChip( day: InventoryDay, selected: Boolean, width: Dp, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun InventoryTable( dateLabel: String, entries: List&lt;InventoryEntry&gt;, onAdd: () -&gt; Unit, onExportCsv: () -&gt; Unit, onResetDay: () -&gt; Unit, onRowAdjust: (InventoryEntry) -&gt; Unit )</ID>
+    <ID>FunctionNaming:TodayScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFFF8FAFC) @Composable fun TodayScreenPreview()</ID>
+    <ID>FunctionNaming:WeekGridScreen.kt$@Composable fun WeekGridScreen( onOpenSettings: () -&gt; Unit, onApply: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:WeekGridScreen.kt$@Preview(showBackground = true) @Composable @Suppress("UnusedPrivateMember") private fun WeekGridPreview()</ID>
+    <ID>LongMethod:AppDatabaseMigrations.kt$&lt;no name provided&gt;$override fun migrate(database: SupportSQLiteDatabase)</ID>
+    <ID>LongMethod:DailyResetWorker.kt$DailyResetWorker$override suspend fun doWork(): Result</ID>
+    <ID>LongMethod:DebugDatabaseSeeder.kt$DebugDatabaseSeeder$suspend fun seed(database: AppDatabase)</ID>
+    <ID>LongMethod:TodayScreen.kt$@Composable private fun InventoryEntryCard( entry: InventoryEntry, onAdjust: () -&gt; Unit, onQuickSoldOut: () -&gt; Unit )</ID>
+    <ID>LongMethod:TodayScreen.kt$@Composable private fun ReuseItemPickerDialog( items: List&lt;InventoryEntry&gt;, onDismiss: () -&gt; Unit, onPicked: (InventoryEntry) -&gt; Unit )</ID>
+    <ID>LongMethod:TodayScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TodayScreen( state: TodayUiState = sampleTodayUiState, onScheduleReset: () -&gt; Unit = {}, onExportCsv: () -&gt; Unit = {}, onAdjustItem: (InventoryEntry) -&gt; Unit = {}, onSelectDate: (String) -&gt; Unit = {} )</ID>
+    <ID>LongMethod:TodayScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun InventoryTable( dateLabel: String, entries: List&lt;InventoryEntry&gt;, onAdd: () -&gt; Unit, onExportCsv: () -&gt; Unit, onResetDay: () -&gt; Unit, onRowAdjust: (InventoryEntry) -&gt; Unit )</ID>
+    <ID>LongParameterList:Button.kt$( text: String, modifier: Modifier = Modifier, variant: BBQButtonVariant = BBQButtonVariant.PRIMARY, enabled: Boolean = true, shape: Shape = LocalDSShapes.current.chip, leadingContent: (@Composable (() -&gt; Unit))? = null, trailingContent: (@Composable (() -&gt; Unit))? = null, onClick: () -&gt; Unit )</ID>
+    <ID>LongParameterList:Button.kt$( text: String, modifier: Modifier, enabled: Boolean, shape: Shape, background: Color, contentColor: Color, leadingContent: (@Composable (() -&gt; Unit))?, trailingContent: (@Composable (() -&gt; Unit))?, onClick: () -&gt; Unit )</ID>
+    <ID>LongParameterList:DesignSystem.kt$( colors: DSColors = LocalDSColors.current, typography: DSTypography = LocalDSTypography.current, spacing: DSSpacing = LocalDSSpacing.current, radius: DSRadius = LocalDSRadius.current, elevation: DSElevation = LocalDSElevation.current, motion: DSMotion = LocalDSMotion.current, shapes: DSShapes = LocalDSShapes.current, content: @Composable () -&gt; Unit )</ID>
+    <ID>LongParameterList:Input.kt$( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, label: String? = null, helperText: String? = null, enabled: Boolean = true, singleLine: Boolean = true, leadingIcon: (@Composable (() -&gt; Unit))? = null, trailingIcon: (@Composable (() -&gt; Unit))? = null, placeholder: String? = null, visualTransformation: VisualTransformation = VisualTransformation.None, textStyle: TextStyle = MaterialTheme.extendedTypography.bodyLarge, shape: Shape = LocalDSShapes.current.chip )</ID>
+    <ID>LongParameterList:TodayScreen.kt$( dateLabel: String, entries: List&lt;InventoryEntry&gt;, onAdd: () -&gt; Unit, onExportCsv: () -&gt; Unit, onResetDay: () -&gt; Unit, onRowAdjust: (InventoryEntry) -&gt; Unit )</ID>
+    <ID>LongParameterList:TodayScreen.kt$( title: String, subtitle: String, locationName: String, openStatusLabel: String, nextResetLabel: String, showTodayButton: Boolean, onJumpToToday: () -&gt; Unit )</ID>
+    <ID>MagicNumber:DashboardScreen.kt$136</ID>
+    <ID>MagicNumber:DashboardScreen.kt$62</ID>
+    <ID>MagicNumber:DashboardScreen.kt$74</ID>
+    <ID>MagicNumber:DebugDatabaseSeeder.kt$DebugDatabaseSeeder$3600</ID>
+    <ID>MagicNumber:DebugDatabaseSeeder.kt$DebugDatabaseSeeder$7200</ID>
+    <ID>MagicNumber:DesignSystem.kt$0xFF1A1A1A</ID>
+    <ID>MagicNumber:DesignSystem.kt$0xFF666666</ID>
+    <ID>MagicNumber:DesignSystem.kt$DSMotion$0.2f</ID>
+    <ID>MagicNumber:DesignSystem.kt$DSMotion$0.4f</ID>
+    <ID>MagicNumber:MainActivity.kt$300</ID>
+    <ID>MagicNumber:ResetPlanner.kt$ResetPlanner$23</ID>
+    <ID>MagicNumber:ResetPlanner.kt$ResetPlanner$59</ID>
+    <ID>MagicNumber:Theme.kt$0xFF0D0D0D</ID>
+    <ID>MagicNumber:Theme.kt$0xFF111111</ID>
+    <ID>MagicNumber:Theme.kt$0xFF121212</ID>
+    <ID>MagicNumber:Theme.kt$0xFF1A1A1A</ID>
+    <ID>MagicNumber:Theme.kt$0xFF333333</ID>
+    <ID>MagicNumber:Theme.kt$0xFF666666</ID>
+    <ID>MagicNumber:Theme.kt$0xFFB3B3B3</ID>
+    <ID>MagicNumber:Theme.kt$0xFFEAEAEA</ID>
+    <ID>MagicNumber:Theme.kt$0xFFEDEDED</ID>
+    <ID>MagicNumber:TodayScreen.kt$0.1f</ID>
+    <ID>MagicNumber:TodayScreen.kt$0.2f</ID>
+    <ID>MagicNumber:TodayScreen.kt$0.5f</ID>
+    <ID>MagicNumber:TodayScreen.kt$11</ID>
+    <ID>MagicNumber:TodayScreen.kt$13</ID>
+    <ID>MagicNumber:TodayScreen.kt$15</ID>
+    <ID>MagicNumber:TodayScreen.kt$17</ID>
+    <ID>MagicNumber:TodayScreen.kt$3</ID>
+    <ID>MagicNumber:TodayScreen.kt$4</ID>
+    <ID>MagicNumber:TodayScreen.kt$5</ID>
+    <ID>MagicNumber:TodayScreen.kt$6</ID>
+    <ID>MagicNumber:TodayScreen.kt$7</ID>
+    <ID>MagicNumber:TodayScreen.kt$840</ID>
+    <ID>MagicNumber:TodayStateLoader.kt$0.2</ID>
+    <ID>MagicNumber:TodayStateLoader.kt$5</ID>
+    <ID>MagicNumber:TodayStateLoader.kt$7</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFF000000</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFF111111</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFF1A1A1A</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFF333333</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFF444444</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFF4D4D4D</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFF666666</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFF777777</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFFE0E0E0</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFFEAEAEA</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFFF2F2F2</ID>
+    <ID>MagicNumber:Tokens.kt$BBQTokens$0xFFFFFFFF</ID>
+    <ID>MatchingDeclarationName:Button.kt$BBQButtonVariant</ID>
+    <ID>MatchingDeclarationName:DashboardScreen.kt$DayReport</ID>
+    <ID>MatchingDeclarationName:Tabs.kt$BBQTab</ID>
+    <ID>ReturnCount:CounterRepository.kt$CounterRepository$suspend fun applyTemplateForDate( templateId: Long, locationId: Long, targetDate: LocalDate ): ApplyTemplateResult</ID>
+    <ID>SpreadOperator:DatabaseModule.kt$DatabaseModule$(*AppDatabaseMigrations)</ID>
+    <ID>TooManyFunctions:TemplateRepository.kt$TemplateRepository</ID>
+    <ID>TooManyFunctions:TodayScreen.kt$com.bbqreset.ui.screens.TodayScreen.kt</ID>
+    <ID>UnusedParameter:TodayScreen.kt$locationName: String</ID>
+    <ID>UnusedParameter:TodayScreen.kt$onRowAdjust: (InventoryEntry) -&gt; Unit</ID>
+    <ID>UnusedPrivateMember:DashboardScreen.kt$@Preview(showBackground = true) @Composable private fun DashboardPreview()</ID>
+    <ID>UnusedPrivateMember:SettingsScreen.kt$@Preview(showBackground = true) @Composable private fun SettingsPreview()</ID>
+    <ID>UnusedPrivateMember:TodayScreen.kt$@Composable private fun ActionCard( onScheduleReset: () -&gt; Unit, onApplyTemplate: () -&gt; Unit, onExportCsv: () -&gt; Unit )</ID>
+    <ID>UnusedPrivateMember:TodayScreen.kt$@Composable private fun InventoryEntryCard( entry: InventoryEntry, onAdjust: () -&gt; Unit, onQuickSoldOut: () -&gt; Unit )</ID>
+    <ID>UnusedPrivateProperty:JobRepository.kt$JobRepository$private val clock: Clock</ID>
+    <ID>UnusedPrivateProperty:TodayScreen.kt$val isWide = screenWidthDp &gt;= 840</ID>
+    <ID>UnusedPrivateProperty:TodayScreen.kt$val showToast: (String, String) -&gt; Unit = remember { { message, category -&gt; coroutineScope.launch { toastHostState.showSnackbar( message = message, actionLabel = category ) } } }</ID>
+    <ID>WildcardImport:DashboardScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:Theme.kt$import com.bbqreset.ui.design.system.*</ID>
+    <ID>WildcardImport:TodayScreen.kt$import androidx.compose.foundation.layout.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

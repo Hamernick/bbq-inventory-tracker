@@ -10,6 +10,7 @@ import com.bbqreset.data.db.dao.LocationDao
 import com.bbqreset.data.db.dao.LogDao
 import com.bbqreset.data.db.dao.TemplateDao
 import com.bbqreset.data.db.dao.TemplateItemDao
+import com.bbqreset.data.db.dao.WeekPlanDao
 import com.bbqreset.data.db.entity.CounterEntity
 import com.bbqreset.data.db.entity.ItemEntity
 import com.bbqreset.data.db.entity.JobEntity
@@ -17,6 +18,7 @@ import com.bbqreset.data.db.entity.LocationEntity
 import com.bbqreset.data.db.entity.LogEntity
 import com.bbqreset.data.db.entity.TemplateEntity
 import com.bbqreset.data.db.entity.TemplateItemEntity
+import com.bbqreset.data.db.entity.WeekPlanEntity
 
 @Database(
     entities = [
@@ -26,7 +28,8 @@ import com.bbqreset.data.db.entity.TemplateItemEntity
         TemplateItemEntity::class,
         CounterEntity::class,
         LogEntity::class,
-        JobEntity::class
+        JobEntity::class,
+        WeekPlanEntity::class
     ],
     version = AppDatabase.VERSION,
     exportSchema = true
@@ -40,9 +43,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun counterDao(): CounterDao
     abstract fun logDao(): LogDao
     abstract fun jobDao(): JobDao
+    abstract fun weekPlanDao(): WeekPlanDao
 
     companion object {
-        const val VERSION = 1
+        const val VERSION = 4
         const val NAME = "bbq-reset.db"
     }
 }

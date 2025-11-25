@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bbqreset.ui.design.system.LocalDSColors
 
 @Composable
 fun rememberBBQToastHostState(): SnackbarHostState = remember { SnackbarHostState() }
@@ -31,9 +32,10 @@ fun BBQToastHost(
 @Composable
 private fun BBQToast(data: SnackbarData) {
     val visuals = data.visuals
-    // Grayscale, no status colors
+    val ds = LocalDSColors.current
+    // Neutral surface by default
     val background = MaterialTheme.colorScheme.surfaceVariant
-    val content = MaterialTheme.colorScheme.onSurface
+    val content = ds.onSurface
 
     Snackbar(
         containerColor = background,

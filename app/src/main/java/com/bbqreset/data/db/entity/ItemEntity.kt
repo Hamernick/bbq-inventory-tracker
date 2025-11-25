@@ -20,5 +20,7 @@ data class ItemEntity(
     val name: String,
     val sku: String?,
     @ColumnInfo(name = "location_id")
-    val locationId: Long
+    val locationId: Long,
+    @ColumnInfo(name = "unit_type")
+    val unitType: String = "count"
 )

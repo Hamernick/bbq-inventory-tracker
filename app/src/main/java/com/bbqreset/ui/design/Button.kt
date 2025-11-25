@@ -5,10 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,6 +17,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bbqreset.ui.design.system.LocalDSColors
+import com.bbqreset.ui.design.system.LocalDSShapes
 
 enum class BBQButtonVariant { PRIMARY, SECONDARY, OUTLINE, GHOST, DESTRUCTIVE }
 
@@ -25,19 +28,20 @@ fun BBQButton(
     modifier: Modifier = Modifier,
     variant: BBQButtonVariant = BBQButtonVariant.PRIMARY,
     enabled: Boolean = true,
-    shape: Shape = ButtonDefaults.shape,
+    shape: Shape = LocalDSShapes.current.chip,
     leadingContent: (@Composable (() -> Unit))? = null,
     trailingContent: (@Composable (() -> Unit))? = null,
     onClick: () -> Unit
 ) {
+    val ds = LocalDSColors.current
     when (variant) {
         BBQButtonVariant.PRIMARY -> FilledButton(
             text = text,
             modifier = modifier,
             enabled = enabled,
             shape = shape,
-            background = MaterialTheme.extendedColors.primary,
-            contentColor = MaterialTheme.extendedColors.primaryForeground,
+            background = ds.primary,
+            contentColor = ds.onPrimary,
             leadingContent = leadingContent,
             trailingContent = trailingContent,
             onClick = onClick
@@ -47,8 +51,8 @@ fun BBQButton(
             modifier = modifier,
             enabled = enabled,
             shape = shape,
-            background = MaterialTheme.extendedColors.secondary,
-            contentColor = MaterialTheme.extendedColors.secondaryForeground,
+            background = ds.muted,
+            contentColor = ds.mutedForeground,
             leadingContent = leadingContent,
             trailingContent = trailingContent,
             onClick = onClick
@@ -58,8 +62,8 @@ fun BBQButton(
             modifier = modifier,
             enabled = enabled,
             shape = shape,
-            background = MaterialTheme.extendedColors.destructive,
-            contentColor = MaterialTheme.extendedColors.destructiveForeground,
+            background = ds.destructive,
+            contentColor = ds.onDestructive,
             leadingContent = leadingContent,
             trailingContent = trailingContent,
             onClick = onClick
@@ -69,9 +73,9 @@ fun BBQButton(
             modifier = modifier,
             enabled = enabled,
             shape = shape,
-            border = BorderStroke(1.dp, MaterialTheme.extendedColors.border),
+            border = BorderStroke(1.dp, ds.border),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSurface
+                contentColor = ds.onSurface
             )
         ) {
             ButtonContent(text, leadingContent, trailingContent)
@@ -82,7 +86,7 @@ fun BBQButton(
             enabled = enabled,
             shape = shape,
             colors = ButtonDefaults.textButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSurface
+                contentColor = ds.onSurface
             )
         ) { ButtonContent(text, leadingContent, trailingContent) }
     }
@@ -137,6 +141,7 @@ private fun ButtonContent(
         Text(
             text = text,
             style = MaterialTheme.extendedTypography.bodyLarge.copy(
+                color = LocalContentColor.current,
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = 0.5.sp
             )

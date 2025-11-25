@@ -1,51 +1,54 @@
-# CODEX_RUNBOOK — BBQ Inventory Tracker
+# CODEX_RUNBOOK — Clover Inventory Week Scheduler (Manual Apply)
 
 ## Goal
 
-From blank repo → runnable Kotlin Android APK with Today, Templates, Logs, Settings, Scheduler, and Clover API stubs.
+Ship a lean, reliable Android APK with Splash/Boot, NavHost, WeekGrid placeholder, and Settings — aligned to AGENTS rules: UI → VM → UseCase → Repo → Data; offline-first; Manual Apply only; WorkManager used only to execute Apply queue writes.
 
 ---
 
 ## 1️⃣ Environment Setup
 
-**Requirements**
+Requirements
 
-* Android Studio + JDK 17
-* Android SDK API 34
-* Emulator: Pixel 7 (API 34)
-* Repo: [https://github.com/Hamernick/bbq-inventory-tracker](https://github.com/Hamernick/bbq-inventory-tracker)
+- Android Studio (JDK 17)
+- Android SDK API 34–35
+- Emulator: Clover tablet profile (1280×800) or Pixel reference device
 
-**Commands**
+Commands
 
 ```bash
-git clone https://github.com/Hamernick/bbq-inventory-tracker.git
+git clone <repo>
 cd bbq-inventory-tracker
 git checkout -b dev
 ./gradlew assembleDebug
 ```
 
-**Branching**
+Branching
 
-* `main` → protected
-* `dev` → integration branch
-* `feat/*` → feature work
+- `main` → protected
+- `dev` → integration branch
+- `feat/*` → feature work
 
 ---
 
 ## 2️⃣ Development Flow
 
-| Phase              | Goal                 | Deliverables                                   | Acceptance                        |
-| ------------------ | -------------------- | ---------------------------------------------- | --------------------------------- |
-| **M1 Bootstrap**   | Compose UI shell     | `MainActivity`, shadcn primitives, TodayScreen | App builds, emulator renders      |
-| **M2 Room Schema** | Local DB             | Entities, DAO, Migration v1                    | DAO tests pass                    |
-| **M3 Templates**   | Prep templates       | CRUD + apply logic                             | State persists; toast + log entry |
-| **M4 Scheduler**   | Daily reset          | WorkManager job + tz aware                     | Worker idempotent per (date, loc) |
-| **M5 Counters**    | Track sold/remaining | Domain math, Today UI updates                  | Unit tests green                  |
-| **M6 Orders Stub** | Ingest sales         | OrdersRepo, fixtures, refund reversal          | Test delta calc                   |
-| **M7 Alerts**      | Threshold warnings   | Notifier interface + Toast impl                | Toast shows at threshold          |
-| **M8 Analytics**   | Trends & export      | Charts + CSV writer                            | CSV downloads                     |
-| **M9 Clover API**  | Retrofit wiring      | AuthInterceptor + Inventory/Orders APIs        | Handles 401/retry                 |
-| **M10 Hardening**  | QA & CI              | Tests, detekt, ktlint, coverage                | CI green                          |
+| Phase                         | Goal                         | Deliverables                                                                 | Acceptance                                     |
+| ----------------------------- | ---------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------- |
+| M1 — Bootstrap + Splash/Main  | App shell + navigation       | Splash/Boot gate, `NavHost`, placeholder `WeekGrid` and `Settings` screens  | App builds; emulator renders; lint configured   |
+| M2 — OAuth (PKCE) + Auth Gate | Login + token store          | PKCE flow, token storage, refresh, bound-device check                        | 401 replay; tokens persisted securely          |
+| M3 — Catalog + Room           | Local DB ingest              | Room schema, entities, DAO, ingestion of items/locations                     | DAO tests pass; paging works                   |
+| M4 — Week Grid UI             | Editing UX                   | Grid layout, multi-select, dialogs                                           | Smooth scroll; previews compile                 |
+| M5 — Apply Queue              | Manual Apply writes only     | Queue-first sync, idempotency keys, WorkManager executor                     | Same write cannot apply twice                   |
+| M6 — UX Polish                | A11y + perf + copy           | Labels, contrast, focus order, perf budget                                   | A11y checks pass; no jank                       |
+| M7 — Settings + Telemetry     | Admin + logging              | Settings screen finalization, logging/metrics                                | Stability and store polish                      |
+
+Rules carried from AGENTS
+
+- Architecture: UI → VM → UseCase → Repo → Data.
+- Offline-first: Room is source of truth.
+- Manual Apply: write to Clover only on user action.
+- WorkManager: only for Apply queue execution (no timed resets).
 
 ---
 
@@ -53,7 +56,7 @@ git checkout -b dev
 
 ```bash
 # Build + install
-gradlew clean assembleDebug
+./gradlew clean assembleDebug
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n com.bbqreset/.MainActivity
 
@@ -61,16 +64,16 @@ adb shell am start -n com.bbqreset/.MainActivity
 ./gradlew ktlintCheck detekt testDebugUnitTest
 
 # Feature branch flow
-git checkout -b feat/templates
-git add -A && git commit -m "feat: templates screen"
-git push -u origin feat/templates
+git checkout -b feat/m1-bootstrap
+git add -A && git commit -m "feat(m1): splash + nav host + week grid placeholders"
+git push -u origin feat/m1-bootstrap
 ```
 
 ---
 
 ## 4️⃣ GitHub Actions (CI/CD)
 
-**.github/workflows/android-ci.yml**
+android-ci.yml
 
 ```yaml
 name: Android CI
@@ -92,7 +95,7 @@ jobs:
         with: { name: apk-debug, path: app/build/outputs/apk/debug/*.apk }
 ```
 
-**.github/workflows/release.yml**
+release.yml
 
 ```yaml
 name: Release
@@ -116,53 +119,57 @@ jobs:
 
 ## 5️⃣ Environment & Config
 
-* `local.properties` → SDK path
-* `app/src/main/assets/config.json`
+- `local.properties` → SDK path
+- `app/src/main/assets/config.json`
 
 ```json
-{ "sandbox": true, "thresholdDefault": 5, "apiBase": "https://apisandbox.dev.clover.com" }
+{ "sandbox": true, "apiBase": "https://apisandbox.dev.clover.com" }
 ```
 
-* Secrets: `EncryptedSharedPreferences`
+- Secrets: `EncryptedSharedPreferences` (never in git)
 
 ---
 
 ## 6️⃣ Test Plan
 
-**Unit Tests**
+Unit
 
-* `ResetPlannerTest`, `SchedulerTest`, `CountersTest`, DAO CRUD.
-  **Integration**
-* Template apply → verify counters.
-  **UI Previews**
-* Compose previews compile (Today, Templates, Logs).
+- Feature-scoped unit tests (UseCases/Repos)
+- DAO CRUD tests for Room
+
+UI
+
+- Compose previews compile (Splash, WeekGrid, Settings)
+
+Load
+
+- 10k items scroll target (when grid implemented)
 
 ---
 
 ## 7️⃣ Release Steps
 
 ```bash
-git tag v0.1.0 -m "MVP UI + Scheduler"
+git tag v0.1.0 -m "M1: Splash + NavHost + placeholders"
 git push origin v0.1.0
 ```
 
-CI builds → artifact uploaded → optional Appetize.io upload.
+CI builds → APK artifact uploaded.
 
 ---
 
 ## 8️⃣ Acceptance Checklist
 
-* ✅ CI green (build, tests, lint)
-* ✅ Core flows: Apply Template, Daily Reset, Adjust, Alerts, Export CSV
-* ✅ No secrets committed
-* ✅ a11y: labels, contrast, focus order
-* ✅ Logs redact tokens
+- CI green (build, tests, lint)
+- Manual Apply only (no timed resets)
+- Offline-first queue model in place by M5
+- No secrets committed; logs redacted; basic a11y
 
 ---
 
 ## 9️⃣ Next Targets
 
-* Clover webhook receiver service (optional cloud)
-* Push notifications via webhook
-* PDF report generator
-* Multi-tenant analytics dashboard
+- Webhook receiver (optional cloud)
+- Push notifications via webhook
+- PDF report generator stub
+- Multi-tenant analytics dashboard

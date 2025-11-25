@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.bbqreset.ui.design.system.LocalDSShapes
 
 @Composable
 fun BBQInputField(
@@ -30,7 +31,7 @@ fun BBQInputField(
     placeholder: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     textStyle: TextStyle = MaterialTheme.extendedTypography.bodyLarge,
-    shape: Shape = MaterialTheme.shapes.small
+    shape: Shape = LocalDSShapes.current.chip
 ) {
     Column(modifier = modifier) {
         if (!label.isNullOrEmpty()) {

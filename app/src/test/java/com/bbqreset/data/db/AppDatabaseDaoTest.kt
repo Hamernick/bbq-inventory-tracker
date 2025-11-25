@@ -5,20 +5,21 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.bbqreset.data.db.entity.JobStatus
-import com.bbqreset.data.repo.CounterRepository
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.LocalDate
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class AppDatabaseDaoTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
@@ -49,7 +50,10 @@ class AppDatabaseDaoTest {
         val template = database.templateDao().listTemplates(locations.first().id).first()
         val templateItems = database.templateItemDao().listForTemplate(template.id)
         val mostRecentDate = database.counterDao().getMostRecentDate(locations.first().id)
-        val counters = database.counterDao().listCountersForDate(locations.first().id, mostRecentDate!!)
+        val counters = database.counterDao().listCountersForDate(
+            locations.first().id,
+            mostRecentDate!!
+        )
         val jobs = database.jobDao().listActiveJobs()
         val logs = database.logDao().pageLogs(limit = 10, offset = 0)
 
@@ -89,55 +93,5 @@ class AppDatabaseDaoTest {
         assertEquals(JobStatus.DONE, persisted.status)
     }
 
-    @Test
-    fun applyTemplate_populatesCountersForTargetDate() = runTest {
-        val clock = Clock.fixed(Instant.parse("2025-10-08T12:00:00Z"), ZoneOffset.UTC)
-        database.seedDebug(clock)
-
-        val counterRepository = CounterRepository.fromDatabase(database)
-        val locationId = database.locationDao().listLocations().first().id
-        val templateId = database.templateDao().listTemplates(locationId).first().id
-
-        val targetDate = LocalDate.parse("2025-10-09")
-        val result = counterRepository.applyTemplateForDate(
-            templateId = templateId,
-            locationId = locationId,
-            targetDate = targetDate
-        )
-
-        val success = result as? com.bbqreset.data.repo.ApplyTemplateResult.Success
-        assertNotNull(success)
-        assertEquals(templateId, success.templateId)
-        val counters = database.counterDao().listCountersForDate(locationId, targetDate.toString())
-        assertEquals(3, counters.size)
-        val brisket = counters.first { it.itemId == 1L }
-        assertEquals(48, brisket.startQuantity)
-    }
-
-    @Test
-    fun applyTemplate_isIdempotent() = runTest {
-        val clock = Clock.fixed(Instant.parse("2025-10-08T12:00:00Z"), ZoneOffset.UTC)
-        database.seedDebug(clock)
-
-        val counterRepository = CounterRepository.fromDatabase(database)
-        val locationId = database.locationDao().listLocations().first().id
-        val templateId = database.templateDao().listTemplates(locationId).first().id
-
-        val targetDate = LocalDate.parse("2025-10-08")
-        database.counterDao().deleteForDate(locationId, targetDate.toString())
-        val first = counterRepository.applyTemplateForDate(
-            templateId = templateId,
-            locationId = locationId,
-            targetDate = targetDate
-        )
-        val second = counterRepository.applyTemplateForDate(
-            templateId = templateId,
-            locationId = locationId,
-            targetDate = targetDate
-        )
-
-        assertTrue(first is com.bbqreset.data.repo.ApplyTemplateResult.Success)
-        assertTrue(second is com.bbqreset.data.repo.ApplyTemplateResult.AlreadyApplied)
-    }
+    // Counter/template apply tests removed per AGENTS: counter math replaced by direct planning
 }
-
