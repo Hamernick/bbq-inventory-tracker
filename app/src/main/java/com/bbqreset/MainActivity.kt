@@ -3,6 +3,8 @@
 package com.bbqreset
 
 import android.os.Bundle
+import android.net.Uri
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -14,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -28,13 +31,22 @@ import androidx.navigation.compose.rememberNavController
 import com.bbqreset.ui.design.BBQTheme
 import com.bbqreset.ui.screens.SettingsScreen
 import com.bbqreset.ui.screens.WeekGridScreen
+import com.bbqreset.ui.vm.AuthViewModel
 import com.bbqreset.ui.vm.WeekGridViewModel
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
+    private val callbackUri = mutableStateOf<Uri?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { BBQApp() }
+        callbackUri.value = intent?.data
+        setContent { BBQApp(callbackUri) }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        callbackUri.value = intent.data
     }
 }
 
@@ -43,7 +55,7 @@ private const val ROUTE_WEEK = "week"
 private const val ROUTE_SETTINGS = "settings"
 
 @Composable
-fun BBQApp() {
+fun BBQApp(callbackUriState: androidx.compose.runtime.MutableState<Uri?>) {
     BBQTheme {
         val nav = rememberNavController()
         val view = LocalView.current
@@ -67,7 +79,7 @@ fun BBQApp() {
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
-            AppNavHost(nav = nav)
+            AppNavHost(nav = nav, callbackUri = callbackUriState.value, onConsumed = { callbackUriState.value = null })
         }
     }
 }
@@ -75,7 +87,9 @@ fun BBQApp() {
 @Composable
 private fun AppNavHost(
     nav: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    callbackUri: Uri? = null,
+    onConsumed: () -> Unit = {}
 ) {
     NavHost(
         navController = nav,
@@ -92,8 +106,34 @@ private fun AppNavHost(
         composable(ROUTE_WEEK) {
             val vm: WeekGridViewModel = viewModel()
             val uiState by vm.ui.collectAsState()
+            val authVm: AuthViewModel = viewModel()
+            val authState by authVm.state.collectAsState()
+
+            LaunchedEffect(callbackUri) {
+                if (callbackUri != null) {
+                    authVm.handleCallback(
+                        clientId = "T2MW3FEKXMF8W",
+                        uri = callbackUri,
+                        redirectUri = com.bbqreset.data.api.ApiConfig.DEFAULT_REDIRECT_URI
+                    )
+                    onConsumed()
+                }
+            }
+
+            LaunchedEffect(authState.success) {
+                if (authState.success) vm.connect()
+            }
+
             WeekGridScreen(
                 state = uiState,
+                authState = authState,
+                onStartAuth = {
+                    authVm.startAuth(
+                        clientId = "T2MW3FEKXMF8W",
+                        redirectUri = com.bbqreset.data.api.ApiConfig.DEFAULT_REDIRECT_URI,
+                        scopes = listOf("inventory", "inventory.read", "merchant.read", "employees.read")
+                    )
+                },
                 onConnect = { vm.connect() },
                 onOpenSettings = { nav.navigate(ROUTE_SETTINGS) },
                 onCreateItem = vm::createItem,

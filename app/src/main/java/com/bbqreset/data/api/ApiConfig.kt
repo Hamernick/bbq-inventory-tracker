@@ -7,7 +7,7 @@ object ApiConfig {
     const val DEFAULT_BASE_URL = "https://apisandbox.dev.clover.com"
     const val PROD_BASE_URL = "https://api.clover.com"
     const val AUTH_BASE_URL = "https://sandbox.dev.clover.com"
-    const val DEFAULT_REDIRECT_URI = "https://inventoryreset.com/oauth/callback"
+    const val DEFAULT_REDIRECT_URI = "https://hamernick.github.io/bbq-inventory-tracker/oauth/callback"
 
     fun getBaseUrl(context: Context): String =
         SecurePrefs.of(context).getString(KEY_BASE_URL, DEFAULT_BASE_URL) ?: DEFAULT_BASE_URL

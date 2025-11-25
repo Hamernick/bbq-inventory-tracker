@@ -26,6 +26,15 @@
                     android:host="inventoryreset.com"
                     android:path="/oauth/callback" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="hamernick.github.io"
+                    android:pathPrefix="/bbq-inventory-tracker/oauth/callback" />
+            </intent-filter>
         </activity>
     </application>
 

@@ -74,3 +74,4 @@ Notes
 ## 2025-11-25
 - Added HTTPS OAuth redirect intent-filter for `inventoryreset.com/oauth/callback`; set default redirect constant.
 - Removed scaffold top app bar to eliminate blank header space and align controls to screen top.
+- Wired default redirect to GitHub Pages (`https://hamernick.github.io/bbq-inventory-tracker/oauth/callback`) and added callback handler in MainActivity + Connect screen auth launcher.

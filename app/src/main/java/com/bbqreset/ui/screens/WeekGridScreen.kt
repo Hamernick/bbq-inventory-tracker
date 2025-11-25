@@ -2,6 +2,8 @@
 
 package com.bbqreset.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -58,6 +60,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.bbqreset.ui.design.BBQTheme
+import com.bbqreset.ui.vm.AuthState
 import com.bbqreset.ui.vm.CatalogItemUi
 import com.bbqreset.ui.vm.DayKey
 import com.bbqreset.ui.vm.QuantityField
@@ -77,6 +81,8 @@ import java.time.ZoneId
 @Composable
 fun WeekGridScreen(
     state: WeekGridUiState,
+    authState: AuthState? = null,
+    onStartAuth: () -> Unit = {},
     onConnect: () -> Unit,
     onOpenSettings: () -> Unit,
     onCreateItem: (String) -> Unit,
@@ -90,7 +96,13 @@ fun WeekGridScreen(
     onApply: () -> Unit
 ) {
     if (!state.connected) {
-        ConnectScreen(onConnect = onConnect, onOpenSettings = onOpenSettings, onReseedSample = onReseedSample)
+        ConnectScreen(
+            authState = authState,
+            onStartAuth = onStartAuth,
+            onConnect = onConnect,
+            onOpenSettings = onOpenSettings,
+            onReseedSample = onReseedSample
+        )
         return
     }
 
@@ -109,10 +121,25 @@ fun WeekGridScreen(
 }
 
 @Composable
-private fun ConnectScreen(onConnect: () -> Unit, onOpenSettings: () -> Unit, onReseedSample: () -> Unit) {
+private fun ConnectScreen(
+    authState: AuthState?,
+    onStartAuth: () -> Unit,
+    onConnect: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onReseedSample: () -> Unit
+) {
     val painter = rememberAsyncImagePainter(
         model = "https://ui.shadcn.com/_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1602146057681-08560aee8cde%3Fq%3D80%26w%3D640%26auto%3Dformat%26fit%3Dcrop&w=256&q=75"
     )
+    val context = LocalContext.current
+
+    LaunchedEffect(authState?.authUrl) {
+        val url = authState?.authUrl
+        if (!url.isNullOrBlank()) {
+            runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -156,12 +183,20 @@ private fun ConnectScreen(onConnect: () -> Unit, onOpenSettings: () -> Unit, onR
                     )
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = onConnect
+                        enabled = authState?.loading != true,
+                        onClick = onStartAuth
                     ) {
                         Text("Continue (stub auth)")
                     }
                     OutlinedButton(onClick = onReseedSample, modifier = Modifier.fillMaxWidth()) {
                         Text("Reseed Sample Data")
+                    }
+                    if (authState?.error != null) {
+                        Text(
+                            text = authState.error,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                     TextButton(onClick = onOpenSettings) { Text("Settings") }
                 }
