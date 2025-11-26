@@ -5,6 +5,7 @@ package com.bbqreset.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -30,6 +32,8 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -59,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -129,7 +134,7 @@ private fun ConnectScreen(
     onReseedSample: () -> Unit
 ) {
     val painter = rememberAsyncImagePainter(
-        model = "https://ui.shadcn.com/_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1602146057681-08560aee8cde%3Fq%3D80%26w%3D640%26auto%3Dformat%26fit%3Dcrop&w=256&q=75"
+        model = "https://images.unsplash.com/photo-1602146057681-08560aee8cde?auto=format&fit=crop&w=1200&q=80"
     )
     val context = LocalContext.current
 
@@ -145,61 +150,105 @@ private fun ConnectScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        if (painter.state is AsyncImagePainter.State.Success) {
-            androidx.compose.foundation.Image(
-                painter = painter,
-                contentDescription = null,
+        val showImage = painter.state is AsyncImagePainter.State.Success
+        if (showImage) {
+            Row(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                ConnectCard(authState = authState, onStartAuth = onStartAuth, onOpenSettings = onOpenSettings)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = painter,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+        } else {
+            Box(
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+                contentAlignment = Alignment.Center
+            ) {
+                ConnectCard(
+                    authState = authState,
+                    onStartAuth = onStartAuth,
+                    onOpenSettings = onOpenSettings,
+                    fillWidth = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ConnectCard(
+    authState: AuthState?,
+    onStartAuth: () -> Unit,
+    onOpenSettings: () -> Unit,
+    fillWidth: Boolean = false
+) {
+    val cardModifier = if (fillWidth) {
+        Modifier
+            .fillMaxWidth(0.5f)
+            .padding(horizontal = 24.dp, vertical = 28.dp)
+    } else {
+        Modifier
+            .width(320.dp)
+            .padding(28.dp)
+    }
+    Card(modifier = cardModifier, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+        Column(
+            modifier = Modifier.padding(vertical = 24.dp, horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.25f))
-            )
-        }
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Card(
-                modifier = Modifier.width(480.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
             ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Connect to Clover",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = "Sign in to link your Clover sandbox and start planning inventory.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = authState?.loading != true,
-                        onClick = onStartAuth
-                    ) {
-                        Text("Continue (stub auth)")
-                    }
-                    OutlinedButton(onClick = onReseedSample, modifier = Modifier.fillMaxWidth()) {
-                        Text("Reseed Sample Data")
-                    }
-                    if (authState?.error != null) {
-                        Text(
-                            text = authState.error,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                    TextButton(onClick = onOpenSettings) { Text("Settings") }
-                }
+                Icon(
+                    imageVector = Icons.Filled.Widgets,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+            Text(
+                text = "Inventory Scheduler",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = "Link Clover and start planning your weekly stock—no spreadsheets needed.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            Button(
+                modifier = Modifier
+                    .width(240.dp)
+                    .height(48.dp),
+                enabled = authState?.loading != true,
+                onClick = onStartAuth,
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp)
+            ) {
+                Text("Connect to Clover")
+            }
+            if (authState?.error != null) {
+                Text(
+                    text = authState.error,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
     }

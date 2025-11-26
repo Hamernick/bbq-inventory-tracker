@@ -3,9 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Inventory Reset OAuth Callback</title>
+  <script>
+    (function () {
+      try {
+        const qs = window.location.search || '';
+        // Redirect into the app via intent to hand off the auth code
+        const intentUrl = `intent://oauth/callback${qs}#Intent;scheme=com.bbqreset;package=com.bbqreset;end`;
+        window.location.href = intentUrl;
+        // Fallback: still show page
+      } catch (e) {
+        console.warn('Intent redirect failed', e);
+      }
+    })();
+  </script>
 </head>
 <body>
   <h1>Inventory Reset OAuth Callback</h1>
-  <p>GitHub Pages callback endpoint is reachable.</p>
+  <p>If you see this page, the redirect endpoint is reachable. Attempting to open the app…</p>
 </body>
 </html>
