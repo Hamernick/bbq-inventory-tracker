@@ -83,6 +83,7 @@ cd project
 
 **Auth Gate**
 
+* OAuth scopes: `inventory`, `inventory.read`, `merchant.read`, `employees.read` only. Do not request Orders or Payments scopes.
 * If device not bound: run **PKCE**: code → token; fetch **Merchant** (incl. TZ) and **Employee**; persist `{merchantId, tz, employeeId}` and token set in EncryptedSharedPreferences.
 * If bound but token invalid: **refresh**; on failure → Auth.
 
@@ -222,5 +223,30 @@ git push origin v0.1.0
 * Submit to Clover App Market
 
 ---
+
+## 13) UI Guidelines - Android/Compose Adaptation of WIG
+
+Use WIG for web reviews. For Android/Compose, apply the mapped rules below and skip web-only items.
+
+**Apply in Compose:**
+
+* Accessibility: Icon-only actions require `contentDescription` or `semantics { contentDescription = ... }`; use `Modifier.clickable`/`Button` instead of raw pointer input for actions; add `semantics { heading() }` for headings.
+* Focus: Provide visible focus/pressed states; use `Modifier.focusable()`/`FocusRequester` for keyboard focus and do not remove indicators without replacement.
+* Forms: `TextField` must include a label; use `KeyboardOptions` for type and input; do not block paste; show inline errors near the field.
+* Animation: Respect reduced motion (use `LocalMotionDurationScale` or system settings); animate only opacity/transform; avoid layout/size animations unless requested.
+* Typography: Use `TextOverflow.Ellipsis` with `maxLines`; use `fontFeatureSettings = "tnum"` for tabular numbers where needed.
+* Content handling: Long text must truncate or wrap; use `LazyColumn`/`LazyGrid` for large lists; avoid expensive work inside composables.
+* Images: Provide `contentDescription`; set an explicit size or constraints; avoid remote-only hero images for critical UI.
+* Performance: Avoid layout reads in composition; cache with `remember`/`derivedStateOf`; keep recomposition cheap.
+* Navigation & state: Deep-link important screens; reflect key UI state in route args or saved state.
+* Touch: Ensure minimum touch target size; provide pressed/hover feedback with `indication` and `interactionSource`.
+* Safe areas: Use `WindowInsets` and `systemBarsPadding()`/`safeDrawingPadding()` for full-bleed layouts.
+* Locale/i18n: Use locale-aware `DateTimeFormatter` and `NumberFormat`; avoid hardcoded formats.
+
+**Web-only rules to skip in Android:**
+
+* HTML tags/attributes (`<button>`, `<a>`, `aria-*`, `<meta>`, `<link rel=preconnect>`, `loading="lazy"`, `fetchpriority`)
+* CSS-only requirements (`color-scheme`, `scroll-margin-top`, `text-wrap`/`text-pretty`)
+* Hydration/SSR rules
 
 **End of RUNBOOK**

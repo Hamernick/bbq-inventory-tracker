@@ -2,8 +2,8 @@
 
 package com.bbqreset.ui.screens
 
-import android.content.Intent
 import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -141,7 +141,10 @@ private fun ConnectScreen(
     LaunchedEffect(authState?.authUrl) {
         val url = authState?.authUrl
         if (!url.isNullOrBlank()) {
-            runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+            val customTabsIntent = CustomTabsIntent.Builder()
+                .setShowTitle(true)
+                .build()
+            runCatching { customTabsIntent.launchUrl(context, Uri.parse(url)) }
         }
     }
 

@@ -12,10 +12,17 @@ android {
     namespace = "com.bbqreset"
     compileSdk = 35
 
+    signingConfigs {
+        getByName("debug") {
+            enableV1Signing = true
+            enableV2Signing = true
+        }
+    }
+
     defaultConfig {
         applicationId = "com.bbqreset"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 29
         versionCode = 1
         versionName = "1.0"
 
@@ -96,6 +103,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("androidx.activity:activity-compose:1.9.2")
+    implementation("androidx.browser:browser:1.8.0")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.animation:animation")
